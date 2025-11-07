@@ -18,9 +18,11 @@ const heading = 90      // направление камеры (в градус�
 
 function App() {
   const [viewState, setViewState] = useState({
-    longitude: 37.6175,
-    latitude: 55.7558,
-    zoom: 10
+    longitude: 42.4370,
+    latitude: 43.3490,
+    zoom: 11,
+    pitch: 60,
+    bearing: 45
   })
 
   const [camera, setCamera] = useState<{ lat: number; lon: number }>(null);
