@@ -25,7 +25,7 @@ function App() {
     bearing: 45
   })
 
-  const [camera, setCamera] = useState<{ lat: number; lon: number }>(null);
+  const [camera, setCamera] = useState<{ lat: number; lon: number } | null>(null);
 
   const mapRef = useRef<MapRef>(null);
 
@@ -41,7 +41,7 @@ function App() {
 
     setCamera({ lat, lon })
     computeVisibilityPolygon(lat, lon)
-  })
+  }, [])
 
   const destinationPoint = (lat: number, lon: number, distance: number, bearing: number) => {
     const R = 6371000
