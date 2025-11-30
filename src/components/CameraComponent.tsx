@@ -25,9 +25,9 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
   const fillOpacity = isSelected ? 0.6 : isHovered ? 0.4 : 0.2;
 
   // Для выбранной камеры добавляем пунктирную обводку
-  const lineColor = isSelected ? "#00ff00" : "transparent";
-  const lineWidth = isSelected ? 2 : 0;
-  const lineDasharray = isSelected ? [2, 2] : undefined;
+  // const lineColor = isSelected ? "#00ff00" : "transparent";
+  // const lineWidth = isSelected ? 2 : 0;
+  // const lineDasharray = isSelected ? [2, 2] : undefined;
 
   return (
     <>
