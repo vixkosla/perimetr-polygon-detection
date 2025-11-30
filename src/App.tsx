@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 import Map from "react-map-gl/mapbox";
 import type { ViewStateChangeEvent } from "react-map-gl/mapbox";
