@@ -3,17 +3,52 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "electron/build/electron/main.js",
+  "build": {
+    "files": [
+      "dist/**/*",
+      "electron/build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
   "scripts": {
     "dev": "vite",
+    "dev:electron": "tsc -b electron/tsconfig.json && electron electron/build/electron/main.js",
     "build": "tsc -b && vite build",
+    "build:electron": "tsc -b electron/tsconfig.json",
+    "package": "npm run build && npm run build:electron && electron-builder",
+    "package:all": "npm run build && npm run build:electron && electron-builder --mac --win",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.555.0",
     "mapbox-gl": "^3.16.0",
+    "rc-slider": "^11.1.9",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-map-gl": "^8.1.0"
+    "react-map-gl": "^8.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -22,6 +57,9 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
+    "electron": "^39.1.1",
+    "electron-builder": "^26.0.12",
+    "electron-is-dev": "^3.0.1",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",

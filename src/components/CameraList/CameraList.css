@@ -1,0 +1,179 @@
+.interface__camera-list {
+    max-width: 350px;
+    max-height: 70vh;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 0 10px 10px 0;
+    padding: 0 0 5px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    pointer-events: auto;
+    font-family: monospace;
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    opacity: 0.8;
+    /* Принудительно включаем скролл даже если контент не переполнен (для проверки) */
+    /* overflow-y: scroll; */
+    /* Важно: контейнер должен иметь фиксированную высоту для работы overflow */
+    /* Если высота динамическая, скролл не сработает */
+    /* Проверь что контент действительно больше 70vh */
+}
+
+/* Кастомный скроллбар для Webkit (Chrome, Safari, Edge) */
+.interface__camera-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.interface__camera-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.interface__camera-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.interface__camera-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Для Firefox */
+.interface__camera-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+}
+
+.camera-list__header {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 45px 45px;
+    gap: 8px;
+    padding: 4px 24px 4px 0;
+    /*border-radius: 0 5px 2.5px 0;*/
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    /*margin-bottom: 8px;*/
+    font-weight: bold;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* Фиксируем header чтобы он не скроллился */
+    position: sticky;
+    top: -12px; /* компенсация padding контейнера */
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+}
+
+.camera-list__item {
+    display: grid;
+    grid-template-columns: 50px 1fr 150px 25px 25px;
+    gap: 8px;
+    padding: 2px;
+    font-size: 10px;
+    font-weight: 200;
+    /*background: rgba(100, 100, 100, 0.45);*/
+    /*margin-bottom: 6px;*/
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    /*line-height: 19.5px;*/
+}
+
+.camera-list__item:hover {
+    border-radius: 4px;
+    background: rgba(1, 150, 1, 0.6);
+    border-color: rgba(255, 255, 255, 0.7);
+    transform: translateX(4px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.camera-list__item.active {
+    background: rgba(255, 68, 68, 0.6);
+    border-color: rgba(255, 255, 255, 0.9);
+}
+
+.camera-list__item.active:hover {
+    background: rgba(255, 68, 68, 0.75);
+}
+
+.camera-list__id {
+    font-family: monospace;
+    font-size: 10px;
+    color: rgba(40, 250, 50, 0.5);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 18px;
+}
+
+.camera-list__name {
+    font-weight: regular;
+    /*font-family: Verdana, Geneva, Tahoma, sans-serif;*/
+    color: rgba(0, 30, 0, 0.5);
+    text-transform: uppercase;
+    font-size: 10px;
+    /*color: white;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 18px;
+}
+
+.camera-list__coords {
+    font-family: monospace;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    gap: 2.5px;
+    justify-content: center;
+    align-items: flex-start;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    /*padding: 0 5px;*/
+    border-radius: 2.5px;
+    background: rgba(100, 150, 100, 0.55);
+}
+
+.camera-list__coords-number,
+.camera-list__coords-separator {
+    display: inline-block;
+    color: rgba(60, 0, 0, 0.5);
+}
+
+.camera-list__coords-separator {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.camera-list__hfov,
+.camera-list__heading {
+    /*color: rgba(255, 255, 255, 0.8);*/
+    font-weight: bold;
+    line-height: 18px;
+}
+
+.camera-list__hfov {
+    text-align: right;
+    color: rgba(0, 10, 20, 0.5);
+}
+
+.camera-list__heading {
+    text-align: left;
+    color: rgba(50, 0, 50, 0.5);
+}
+
+.camera-list__item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.camera-list__item--hovered {
+    background-color: #f0f0f0;
+}
+
+.camera-list__item--selected {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196f3;
+}
