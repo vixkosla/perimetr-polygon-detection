@@ -1,46 +1,75 @@
-camera-settings-popup-container {
-    max-width: 500px !important;
+:root {
+    --add-button-background: rgba(100, 100, 100, 0.65);
+    --add-button-cancel: rgba(100, 30, 1, 0.9);
+    --add-button-aprove: rgba(1, 150, 1, 0.9);
+
+    --filter-shadow: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+
+    --hfov: rgba(0, 10, 20, 0.5);
+    --coordinates: rgba(60, 0, 0, 0.5);
+    --coordinates-background: rgba(100, 150, 100, 0.55);
+}
+
+.mapboxgl-popup-content {
+    background: color-mix(
+        in srgb,
+        var(--add-button-background),
+        rgba(255, 255, 255, 0.4)
+    );
+    border-radius: 8px;
+    filter: var(--filter-shadow);
+    border: 1px solid white;
+    font-family: ui-monospace, SFMono-Regular, Menlo, "Roboto Mono", monospace;
+    padding: 0;
+}
+
+.camera-settings-popup-container {
+    max-width: 300px !important;
 }
 
 .camera-settings-popup {
-    background: white;
+    /*background: var(--add-button-background);*/
     border-radius: 8px;
     overflow: hidden;
-    min-width: 400px;
+    min-width: 240px;
 }
 
 .popup-header {
-    padding: 16px 20px;
+    padding: 8px 20px;
     border-bottom: 1px solid #e0e0e0;
 }
 
 .popup-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: white;
 }
 
 .popup-content {
-    padding: 20px;
+    /*padding: 20px;*/
     max-height: 50vh;
     overflow-y: auto;
 }
 
 .setting-group {
-    margin-bottom: 24px;
-}
-
-.setting-group:last-child {
-    margin-bottom: 0;
+    /*margin-bottom: 24px;*/
+    display: flex;
+    flex-direction: row;
 }
 
 .setting-group label {
     display: block;
-    margin-bottom: 10px;
     font-size: 13px;
     font-weight: 500;
     color: #555;
+}
+
+.setting-unit {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+    min-width: 20px;
 }
 
 .setting-group label strong {
@@ -51,61 +80,60 @@ camera-settings-popup-container {
 .camera-name-input {
     width: 100%;
     padding: 8px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
+    /*border: 2px solid #e0e0e0;*/
+    /*border-radius: 6px;*/
     font-size: 14px;
     transition: border-color 0.2s;
+    /*text-transform: uppercase;*/
+    background: inherit;
+    outline: none;
+    border: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    text-shadow: 2px 2px 0 var(--coordinates);
 }
 
 .camera-name-input:focus {
-    outline: none;
-    border-color: #ff9800;
+    /*outline: none;*/
+    /*border-color: ;*/
+    outline: 2px solid var(--add-button-aprove);
 }
 
 .coordinates-display {
     padding: 8px 12px;
+    width: 100%;
+    height: 4.5rem;
     background: #f5f5f5;
     border-radius: 6px;
-    font-family: "Courier New", monospace;
-    font-size: 12px;
-    color: #666;
+    font-size: 32px;
+    line-height: 2.25rem;
+    color: color-mix(in srgb, var(--coordinates) 90%, white);
+    background: color-mix(in srgb, var(--coordinates-background) 90%, white);
+    display: flex;
+    align-items: flex-end;
+    justify-content: left;
+    cursor: default;
 }
 
-.rc-slider {
-    margin-bottom: 8px;
-}
-
-.rc-slider-track {
-    background-color: #ff9800;
-}
-
-.rc-slider-handle {
-    border-color: #ff9800;
-}
-
-.rc-slider-handle:active {
-    border-color: #ff9800;
-    box-shadow: 0 0 5px #ff9800;
-}
-
-.rc-slider-mark-text {
-    font-size: 10px;
-    color: #999;
+.coordinates-display span {
+    display: inline-block;
+    font-weight: 500;
 }
 
 .popup-footer {
-    padding: 12px 20px;
+    padding: 0px;
     border-top: 1px solid #e0e0e0;
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 0px;
+    /*background: color-mix(in srgb, var(--coordinates-background) 60%, white);*/
 }
 
 .btn-cancel,
 .btn-confirm {
     padding: 8px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 0px;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -118,19 +146,21 @@ camera-settings-popup-container {
 }
 
 .btn-cancel:hover {
-    background: #e0e0e0;
+    background: var(--add-button-cancel);
+    color: #f5f5f5;
 }
 
 .btn-confirm {
-    background: #ff9800;
+    background: var(--coordinates-background);
     color: white;
 }
 
 .btn-confirm:hover {
-    background: #f57c00;
+    background: var(--add-button-aprove);
+    color: white;
 }
 
-/*// Переопределение стилей mapbox popup*/
+// Переопределение стилей mapbox popup
 .mapboxgl-popup-content {
     padding: 0 !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
@@ -145,4 +175,16 @@ camera-settings-popup-container {
 .mapboxgl-popup-close-button:hover {
     background-color: #f5f5f5;
     color: #333;
+}
+
+.leva-container {
+    transform: translateY(25px);
+
+    /*position: absolute;*/
+    /*position: relative;*/
+    /*top: 150px;*/
+}
+
+.leva-container > div {
+    border: 1px solid white !important;
 }

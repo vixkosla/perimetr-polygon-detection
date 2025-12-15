@@ -1,8 +1,8 @@
-import type { Settings } from "../types/Settings.ts";
+import type { Settings } from "@/types/Settings.ts";
 
-import { useGlobalStore } from "../store/useGlobalStore";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
-import { destinationPoint } from "./destinationPoint";
+import { destinationPoint } from "@/services/destinationPoint";
 
 export const computePolygon = async (
   lat: number,

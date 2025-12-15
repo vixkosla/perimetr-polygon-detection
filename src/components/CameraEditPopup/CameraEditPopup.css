@@ -1,0 +1,93 @@
+div:has(.interface__edit-mode) {
+    background: color-mix(
+        in srgb,
+        var(--add-button-background) 10%,
+        rgba(255, 255, 255, 0.1)
+    );
+
+    border-radius: 8px 8px 20px 20px;
+    /*overflow: hidden;*/
+}
+
+.edit-mode__container {
+    min-height: 100px;
+    min-width: 140px;
+    /*background: linear-gradient(45deg, #ff0000 0%, #8b0000 50%, #2c2c2c 150%);
+    filter: blur(8px) contrast(200%) hue-rotate(-10deg)
+        drop-shadow(0 0 20px rgba(255, 0, 0, 0.3));
+    opacity: 0.35;*/
+}
+
+.edit-mode__controls {
+    border: 2px solid white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 0 0 18px 20px;
+    transform: translateX(1px);
+}
+
+.edit-mode__controls-button {
+    border: 3px solid var(--coordinates);
+    padding: 6px 8px;
+    background: white;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4));
+    transition: all 0.2s linear;
+    transform-origin: right;
+    flex: 1;
+}
+
+.edit-mode__controls-button.edit-mode__controls-button-trash {
+    border-top: 1px solid var(--coordinates);
+    border-right: 1px solid var(--coordinates);
+    transform: translateX(2px);
+}
+
+.edit-mode__controls-button:hover {
+    transform: scale(1.05);
+}
+
+.edit-mode__controls-button:active {
+    transform: scale(0.95);
+}
+
+.edit-mode__controls-button svg {
+    padding-top: 2px;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.5));
+}
+
+.edit-mode__controls-button-left,
+.edit-mode__controls-button-right {
+    padding: 6px 8px;
+}
+
+.edit-mode__controls-button-left {
+    border-radius: 0 5px 0 20px;
+    clip-path: inset(-10px 0px -10px -10px);
+    border-right: 1px solid var(--coordinates);
+    border-top: 1px solid var(--coordinates);
+    border-left: 0.5px solid var(--coordinates);
+}
+
+.edit-mode__controls-button-left svg {
+    /*transform: rotateZ(-5deg);*/
+}
+
+.edit-mode__controls-button-right svg {
+    /*transform: rotateZ(5deg);*/
+}
+
+.edit-mode__controls-button-right {
+    border-radius: 5px 0 18px 0;
+    transform: translateX(3px);
+    border-right: 1px solid var(--coordinates);
+    border-top: 1px solid var(--coordinates);
+}
+
+.edit-mode__controls-button-right:hover {
+    /*border-radius: 5px 0 18px 0;*/
+    /*transform: translateX(3px);*/
+    border-left: 1px solid var(--coordinates);
+    /*border-top: 1px solid var(--coordinates);*/
+}

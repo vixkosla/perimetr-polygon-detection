@@ -1,12 +1,19 @@
 import "./HelperPopUp.css";
 
 import { Popup } from "react-map-gl/mapbox";
-import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
 
-import type { CameraData } from "../../types/CameraData";
-import type { Settings } from "../../types/Settings";
-import { useGlobalStore } from "../../store/useGlobalStore";
+import { LevaPanel, useCreateStore, useControls } from "leva";
+// import { createStore } from "leva";
+// import Slider from "rc-slider";
+// import "rc-slider/assets/index.css";
+//
+import { useEffect } from "react";
+
+import type { CameraData } from "@/types/CameraData";
+import type { Settings } from "@/types/Settings";
+import { useGlobalStore } from "@/store/useGlobalStore";
+
+import { themeColors } from "@/constants/lemeComponentTheme";
 
 interface popupProps {
   data: CameraData;
@@ -30,12 +37,39 @@ export const HelperPopUp = ({
     cancelHelper();
   };
 
+  const store = useCreateStore();
+
+  const [values] = useControls(
+    () => ({
+      heading: { value: data.settings.heading, min: 0, max: 360, step: 1 },
+      hfov: { value: data.settings.hfov, min: 10, max: 180, step: 1 },
+      maxRange: {
+        value: data.settings.maxRange,
+        min: 1000,
+        max: 15000,
+        step: 100,
+      },
+      cameraHeight: {
+        value: data.settings.cameraHeight,
+        min: 1,
+        max: 200,
+        step: 1,
+      },
+    }),
+    { store },
+  );
+
+  // Отслеживаем изменения values
+  useEffect(() => {
+    updateSettings(values);
+  }, [values, updateSettings]);
+
   return (
     <>
       <Popup
         longitude={data.lng}
         latitude={data.lat}
-        anchor="left"
+        anchor="right"
         offset={20}
         onClose={cancelHelper}
         closeOnClick={false}
@@ -44,96 +78,34 @@ export const HelperPopUp = ({
       >
         <div className="camera-settings-popup">
           <div className="popup-header">
-            <h3>Настройки камеры</h3>
+            <h3>Настройки ОПУ</h3>
           </div>
 
           <div className="popup-content">
             {/* Название */}
             <div className="setting-group">
-              <label>Название</label>
+              {/*<label>Название</label>*/}
               <input
                 type="text"
                 value={data.name}
                 onChange={(e) => updateName(e.target.value)}
-                placeholder="Камера 1"
+                placeholder="ОПУ-1"
                 className="camera-name-input"
               />
             </div>
 
             {/* Координаты */}
             <div className="setting-group">
-              <label>Координаты</label>
+              {/*<label>Координаты</label>*/}
               <div className="coordinates-display">
                 <span>
-                  {data.lat.toFixed(5)}, {data.lng.toFixed(5)}
+                  {data.lat.toFixed(5)} <br /> {data.lng.toFixed(5)}
                 </span>
               </div>
             </div>
-
-            {/* Направление (Heading) */}
-            <div className="setting-group">
-              <label>
-                Направление: <strong>{data.settings.heading}°</strong>
-              </label>
-              <Slider
-                min={0}
-                max={360}
-                value={data.settings.heading}
-                onChange={(value) =>
-                  updateSettings({ heading: value as number })
-                }
-                marks={{
-                  0: "0° (С)",
-                  90: "90° (В)",
-                  180: "180° (Ю)",
-                  270: "270° (З)",
-                  360: "360°",
-                }}
-              />
-            </div>
-
-            {/* Угол обзора (HFOV) */}
-            <div className="setting-group">
-              <label>
-                Угол обзора: <strong>{data.settings.hfov}°</strong>
-              </label>
-              <Slider
-                min={10}
-                max={180}
-                value={data.settings.hfov}
-                onChange={(value) => updateSettings({ hfov: value as number })}
-                marks={{
-                  10: "10°",
-                  60: "60°",
-                  90: "90°",
-                  120: "120°",
-                  180: "180°",
-                }}
-              />
-            </div>
-
-            {/* Дальность */}
-            <div className="setting-group">
-              <label>
-                Дальность: <strong>{data.settings.maxRange}м</strong>
-              </label>
-              <Slider
-                min={1000}
-                max={15000}
-                step={500}
-                value={data.settings.maxRange}
-                onChange={(value) =>
-                  updateSettings({ maxRange: value as number })
-                }
-                marks={{
-                  1000: "1км",
-                  5000: "5км",
-                  10000: "10км",
-                  15000: "15км",
-                }}
-              />
-            </div>
           </div>
+
+          {/* Высота камеры */}
 
           <div className="popup-footer">
             <button className="btn-cancel" onClick={cancelHelper}>
@@ -143,6 +115,14 @@ export const HelperPopUp = ({
               Добавить камеру
             </button>
           </div>
+        </div>
+        <div className="leva-container">
+          <LevaPanel
+            store={store}
+            theme={themeColors}
+            // hidetitleBar
+            hideCopyButton
+          />
         </div>
       </Popup>
     </>

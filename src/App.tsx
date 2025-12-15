@@ -9,17 +9,18 @@ import type { MapMouseEvent } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // import { useCameras } from "./hooks/useCameras";
-import { useGlobalStore } from "./store/useGlobalStore.ts";
+import { useGlobalStore } from "@/store/useGlobalStore.ts";
 
-import { CameraComponent } from "./components/CameraComponent";
-import { CameraList } from "./components/CameraList/CameraList.tsx";
-import { CameraAddButton } from "./components/CameraAddButton/CameraAddButton.tsx";
-import { CameraAddCursor } from "./components/CameraAddCursor/CameraAddCursor.tsx";
+import { CameraComponent } from "@/components/CameraComponent";
+import { CameraList } from "@/components/CameraList/CameraList.tsx";
+import { CameraAddButton } from "@/components/CameraAddButton/CameraAddButton.tsx";
+import { CameraAddCursor } from "@/components/CameraAddCursor/CameraAddCursor.tsx";
 
-import { usePreview } from "./hooks/usePreview.ts";
+import { usePreview } from "@/hooks/usePreview.ts";
 
-import { HelperPopUp } from "./components/HelperPopUp/HelperPopUp";
-import { HelperPreview } from "./components/HelperPreview/HelperPreview";
+import { HelperPopUp } from "@/components/HelperPopUp/HelperPopUp";
+import { HelperPreview } from "@/components/HelperPreview/HelperPreview";
+import { CameraEditPopup } from "@/components/CameraEditPopup/CameraEditPopup.tsx";
 
 function App() {
   const [viewState, setViewState] = useState({
@@ -29,33 +30,58 @@ function App() {
     pitch: 60,
     bearing: 45,
   });
+  const [cursor, setCursor] = useState<string>('auto');
 
   const { data, initData, updateName, updateSettings, clearData } =
     usePreview();
 
   const cameraes = useGlobalStore((state) => state.cameraes);
+  const editingCameraId = useGlobalStore((state) => state.editingCameraId);
+  const setEditingCameraId = useGlobalStore(
+    (state) => state.setEditingCameraId,
+  );
 
   const [isAddingMode, setIsAddingMode] = useState<boolean>(false);
 
   const setMapRef = useGlobalStore.getState().setMapRef;
+
+  const interactiveLayers = cameraes.map((c) => `camera-layer-${c.id}`);
 
   const onMove = (evt: ViewStateChangeEvent) => {
     setViewState(evt.viewState);
   };
 
   const handleClick = (e: MapMouseEvent) => {
-    if (!isAddingMode) return;
+    if (isAddingMode) {
+      const lat = e.lngLat.lat;
+      const lon = e.lngLat.lng;
+      initData(lat, lon);
+      return;
+    }
 
-    const lat = e.lngLat.lat;
-    const lon = e.lngLat.lng;
-
-    initData(lat, lon);
+    const feature = e.features?.[0];
+    if (feature && feature.properties && "id" in feature.properties) {
+      const cameraId = feature.properties.id as string;
+      setEditingCameraId(cameraId);
+    }
   };
 
   const cancelHelper = () => {
     setIsAddingMode(false);
     clearData();
   };
+
+  const onMouseEnter = (e: MapMouseEvent) => {
+    if (
+      e.features &&
+      e.features.length > 0 &&
+      e.features[0].layer &&
+      e.features[0].layer.id.startsWith("camera-layer-")
+    ) {
+      setCursor("pointer");
+    }
+  };
+  const onMouseLeave = () => setCursor('auto');
 
   return (
     <>
@@ -74,6 +100,10 @@ function App() {
           ref={setMapRef}
           onClick={handleClick}
           onMove={onMove}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          cursor={cursor}
+          interactiveLayerIds={interactiveLayers}
           mapStyle="mapbox://styles/mapbox/outdoors-v12"
           mapboxAccessToken="pk.eyJ1IjoiaG9va2FobG9jYXRvciIsImEiOiI5WnJEQTBBIn0.DrAlI7fhFaYr2RcrWWocgw"
           terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
@@ -104,6 +134,8 @@ function App() {
               updateSettings={updateSettings}
             />
           )}
+
+          {editingCameraId && <CameraEditPopup />}
         </Map>
       </div>
       <div className="interface-container">

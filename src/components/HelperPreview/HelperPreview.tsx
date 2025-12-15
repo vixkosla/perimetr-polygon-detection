@@ -3,8 +3,8 @@ import "./HelperPreview.css";
 import { useMemo } from "react";
 import { Source, Layer } from "react-map-gl/mapbox";
 
-import type { CameraData } from "../../types/CameraData";
-import { destinationPoint } from "../../services/destinationPoint";
+import type { CameraData } from "@/types/CameraData";
+import { destinationPoint } from "@/services/destinationPoint";
 
 export const HelperPreview = ({ data }: { data: CameraData }) => {
   const {

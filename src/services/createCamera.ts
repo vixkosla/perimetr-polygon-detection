@@ -1,8 +1,8 @@
-import { DEFAULT_CAMERA_SETTINGS } from "../constants/defaultCameraSettings";
-import type { Settings } from "../types/Settings";
-import type { Camera } from "../types/Camera";
+import { DEFAULT_CAMERA_SETTINGS } from "@/constants/defaultCameraSettings";
+import type { Settings } from "@/types/Settings";
+import type { Camera } from "@/types/Camera";
 
-import { computePolygon } from "../services/computePolygon";
+import { computePolygon } from "@/services/computePolygon";
 
 export const createCamera = async (
   name: string,

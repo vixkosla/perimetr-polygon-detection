@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { DEFAULT_CAMERA_SETTINGS } from "../constants/defaultCameraSettings";
+import { DEFAULT_CAMERA_SETTINGS } from "@/constants/defaultCameraSettings";
 
-import type { CameraData } from "../types/CameraData";
-import type { Settings } from "../types/Settings";
+import type { CameraData } from "@/types/CameraData";
+import type { Settings } from "@/types/Settings";
 
 export const usePreview = () => {
   const [data, setData] = useState<CameraData | null>(null);

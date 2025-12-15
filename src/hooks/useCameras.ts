@@ -1,9 +1,9 @@
-import type { Camera } from "../types/Camera";
-import type { Settings } from "../types/Settings";
+import type { Camera } from "@/types/Camera";
+import type { Settings } from "@/types/Settings";
 
 import { useCallback, useState } from "react";
 
-import { createCamera } from "../services/createCamera";
+import { createCamera } from "@/services/createCamera";
 
 export const useCameras = () => {
   const [cameraes, setCameras] = useState<Camera[]>([]);

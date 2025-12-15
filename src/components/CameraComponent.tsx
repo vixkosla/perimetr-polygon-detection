@@ -1,8 +1,66 @@
-import type { Camera } from "../types/Camera";
-
+import type { Camera } from "@/types/Camera";
 import { Source, Layer } from "react-map-gl/mapbox";
+import { useGlobalStore } from "@/store/useGlobalStore.ts";
 
-import { useGlobalStore } from "../store/useGlobalStore.ts";
+// ============================================================================
+// КОНСТАНТЫ ВИЗУАЛЬНЫХ ЭФФЕКТОВ
+// ============================================================================
+
+// Размеры точки камеры
+const CIRCLE_RADIUS = {
+  SELECTED: 8,
+  HOVERED: 6,
+  DEFAULT: 5,
+} as const;
+
+// Цвета точки камеры
+const CIRCLE_COLOR = {
+  SELECTED: "#ff0000",
+  HOVERED: "#ff4444",
+  DEFAULT: "#ff6666",
+} as const;
+
+// Прозрачность точки
+const CIRCLE_OPACITY = {
+  SELECTED: 1,
+  HOVERED: 1.0,
+  DEFAULT: 0.9,
+} as const;
+
+// Обводка точки
+const CIRCLE_STROKE = {
+  WIDTH: {
+    SELECTED: 3,
+    HOVERED: 2,
+    DEFAULT: 0,
+  },
+  COLOR: "#ffffff",
+} as const;
+
+// Цвета заливки полигона
+const POLYGON_FILL_COLOR = {
+  SELECTED: "#00ff00",
+  HOVERED: "#44ff44",
+  DEFAULT: "#88ff88",
+} as const;
+
+// Прозрачность полигона
+const POLYGON_FILL_OPACITY = {
+  SELECTED: 0.1,
+  HOVERED: 0.8,
+  DEFAULT: 0.5,
+} as const;
+
+// Обводка полигона (для выбранной камеры)
+const POLYGON_OUTLINE = {
+  COLOR: '#000000',
+  WIDTH: 2,
+  DASH_ARRAY: [2, 1],
+};
+
+// ============================================================================
+// КОМПОНЕНТ
+// ============================================================================
 
 export const CameraComponent = ({ camera }: { camera: Camera }) => {
   const selectedCameraId = useGlobalStore((state) => state.selectedCameraId);
@@ -11,23 +69,42 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
   const isSelected = selectedCameraId === camera.id;
   const isHovered = hoveredCameraId === camera.id;
 
-  const circleRadius = isSelected ? 8 : isHovered ? 6 : 5;
-  const circleColor = isSelected
-    ? "#ff0000"
+  // Вычисляем стили на основе состояния
+  const circleRadius = isSelected
+    ? CIRCLE_RADIUS.SELECTED
     : isHovered
-      ? "#ff4444"
-      : "#ff6666";
-  const circleOpacity = isSelected ? 1 : isHovered ? 0.9 : 0.5;
-  const circleStrokeWidth = isSelected ? 3 : isHovered ? 2 : 0;
-  const circleStrokeColor = "#ffffff";
+      ? CIRCLE_RADIUS.HOVERED
+      : CIRCLE_RADIUS.DEFAULT;
 
-  const fillColor = isSelected ? "#00ff00" : isHovered ? "#44ff44" : "#88ff88";
-  const fillOpacity = isSelected ? 0.6 : isHovered ? 0.4 : 0.2;
+  const circleColor = isSelected
+    ? CIRCLE_COLOR.SELECTED
+    : isHovered
+      ? CIRCLE_COLOR.HOVERED
+      : CIRCLE_COLOR.DEFAULT;
 
-  // Для выбранной камеры добавляем пунктирную обводку
-  // const lineColor = isSelected ? "#00ff00" : "transparent";
-  // const lineWidth = isSelected ? 2 : 0;
-  // const lineDasharray = isSelected ? [2, 2] : undefined;
+  const circleOpacity = isSelected
+    ? CIRCLE_OPACITY.SELECTED
+    : isHovered
+      ? CIRCLE_OPACITY.HOVERED
+      : CIRCLE_OPACITY.DEFAULT;
+
+  const circleStrokeWidth = isSelected
+    ? CIRCLE_STROKE.WIDTH.SELECTED
+    : isHovered
+      ? CIRCLE_STROKE.WIDTH.HOVERED
+      : CIRCLE_STROKE.WIDTH.DEFAULT;
+
+  const fillColor = isSelected
+    ? POLYGON_FILL_COLOR.SELECTED
+    : isHovered
+      ? POLYGON_FILL_COLOR.HOVERED
+      : POLYGON_FILL_COLOR.DEFAULT;
+
+  const fillOpacity = isSelected
+    ? POLYGON_FILL_OPACITY.SELECTED
+    : isHovered
+      ? POLYGON_FILL_OPACITY.HOVERED
+      : POLYGON_FILL_OPACITY.DEFAULT;
 
   return (
     <>
@@ -43,6 +120,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
           },
           properties: {
             name: camera.name,
+            id: camera.id,
           },
         }}
       >
@@ -54,7 +132,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
             "circle-color": circleColor,
             "circle-opacity": circleOpacity,
             "circle-stroke-width": circleStrokeWidth,
-            "circle-stroke-color": circleStrokeColor,
+            "circle-stroke-color": CIRCLE_STROKE.COLOR,
           }}
         />
       </Source>
@@ -76,7 +154,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
                 ],
               ],
             },
-            properties: { name: "Polygon" },
+            properties: { name: "Polygon", id: camera.id },
           }}
         >
           {/* Заливка полигона */}
@@ -89,15 +167,26 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
             }}
           />
 
+          <Layer
+            id={`polygon-line-${camera.id}`}
+            type="line"
+            paint={{
+              "line-color": "#ffffff",
+              "line-width": 4,
+              "line-opacity": 0.5,
+              // "line-dasharray": [10, 1],
+            }}
+          />
+
           {/* Пунктирная обводка для выбранной камеры */}
           {isSelected && (
             <Layer
               id={`polygon-outline-${camera.id}`}
               type="line"
               paint={{
-                "line-color": "#00ff00",
-                "line-width": 2,
-                "line-dasharray": [2, 2],
+                "line-color": POLYGON_OUTLINE.COLOR,
+                "line-width": POLYGON_OUTLINE.WIDTH,
+                "line-dasharray": POLYGON_OUTLINE.DASH_ARRAY,
               }}
             />
           )}

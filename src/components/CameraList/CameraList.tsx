@@ -1,5 +1,5 @@
-import type { Camera } from "../../types/Camera";
-import { useGlobalStore } from "../../store/useGlobalStore";
+import type { Camera } from "@/types/Camera";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import "./CameraList.css";
 
 export const CameraList = ({ cameraes }: { cameraes: Camera[] }) => {
@@ -50,6 +50,9 @@ export const CameraList = ({ cameraes }: { cameraes: Camera[] }) => {
             <div className="camera-list__hfov">{camera.settings.hfov}°</div>
             <div className="camera-list__heading">
               {camera.settings.heading}°
+            </div>
+            <div className="camera-list__height">
+              {camera.settings.cameraHeight}m
             </div>
           </div>
         ))}
