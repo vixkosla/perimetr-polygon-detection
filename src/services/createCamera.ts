@@ -14,7 +14,7 @@ export const createCamera = async (
   const polygon = await computePolygon(lat, lng, settings);
 
   const camera: Camera = {
-    id: `camera-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `opu-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     name,
     lat,
     lng,

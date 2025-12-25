@@ -30,13 +30,17 @@ function App() {
     pitch: 60,
     bearing: 45,
   });
-  const [cursor, setCursor] = useState<string>('auto');
+  const [cursor, setCursor] = useState<string>("auto");
 
   const { data, initData, updateName, updateSettings, clearData } =
     usePreview();
 
   const cameraes = useGlobalStore((state) => state.cameraes);
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
+
+  const setSelectedCameraId = useGlobalStore(
+    (state) => state.setSelectedCameraId,
+  );
   const setEditingCameraId = useGlobalStore(
     (state) => state.setEditingCameraId,
   );
@@ -63,6 +67,7 @@ function App() {
     if (feature && feature.properties && "id" in feature.properties) {
       const cameraId = feature.properties.id as string;
       setEditingCameraId(cameraId);
+      setSelectedCameraId(cameraId);
     }
   };
 
@@ -81,7 +86,7 @@ function App() {
       setCursor("pointer");
     }
   };
-  const onMouseLeave = () => setCursor('auto');
+  const onMouseLeave = () => setCursor("auto");
 
   return (
     <>

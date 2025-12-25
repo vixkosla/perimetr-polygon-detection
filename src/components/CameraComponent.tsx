@@ -53,10 +53,25 @@ const POLYGON_FILL_OPACITY = {
 
 // Обводка полигона (для выбранной камеры)
 const POLYGON_OUTLINE = {
-  COLOR: '#000000',
+  COLOR: "#000000",
   WIDTH: 2,
   DASH_ARRAY: [2, 1],
 };
+
+// Параметры подписей камер
+const LABEL = {
+  OFFSET: [0, 0.8] as [number, number],
+  SIZE: 14,
+  COLOR: {
+    DEFAULT: "#ffffff",
+    HOVERED: "#ffffff",
+    SELECTED: "#ffffff",
+  },
+  // Text-shadow эффект (как в camera-name-input)
+  HALO_COLOR: "rgba(60, 0, 0, 0.5)", // --coordinates
+  HALO_WIDTH: 1.5,
+  HALO_BLUR: 0,
+} as const;
 
 // ============================================================================
 // КОМПОНЕНТ
@@ -135,6 +150,33 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
             "circle-stroke-color": CIRCLE_STROKE.COLOR,
           }}
         />
+
+        {!isSelected && (
+          <Layer
+            id={`camera-label-${camera.id}`}
+            type="symbol"
+            layout={{
+              "text-field": camera.name,
+              "text-font": ["Roboto Mono Regular", "Arial Unicode MS Regular"],
+              "text-size": LABEL.SIZE,
+              "text-offset": LABEL.OFFSET,
+              "text-anchor": "top",
+              "text-allow-overlap": true,
+              "symbol-sort-key": isSelected ? 100 : isHovered ? 50 : 0,
+            }}
+            paint={{
+              "text-color": isSelected
+                ? LABEL.COLOR.SELECTED
+                : isHovered
+                  ? LABEL.COLOR.HOVERED
+                  : LABEL.COLOR.DEFAULT,
+              "text-halo-color": LABEL.HALO_COLOR,
+              "text-halo-width": LABEL.HALO_WIDTH,
+              "text-halo-blur": LABEL.HALO_BLUR,
+              "text-opacity": isSelected ? 1 : isHovered ? 1 : 0.9,
+            }}
+          />
+        )}
       </Source>
 
       {/* Полигон видимости */}

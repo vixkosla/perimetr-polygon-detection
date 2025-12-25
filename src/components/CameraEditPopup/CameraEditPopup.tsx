@@ -8,6 +8,10 @@ import { CornerLeftUp, CornerRightUp, Trash2 } from "lucide-react";
 export const CameraEditPopup = () => {
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
 
+  const setSelectedCameraId = useGlobalStore(
+    (state) => state.setSelectedCameraId,
+  );
+
   const setEditingCameraId = useGlobalStore(
     (state) => state.setEditingCameraId,
   );
@@ -41,7 +45,10 @@ export const CameraEditPopup = () => {
     <Popup
       longitude={+camera?.lng}
       latitude={+camera?.lat}
-      onClose={() => setEditingCameraId(null)}
+      onClose={() => {
+        setSelectedCameraId(null);
+        setEditingCameraId(null);
+      }}
       anchor="top"
       closeOnClick={false}
     >

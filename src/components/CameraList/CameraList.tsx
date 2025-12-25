@@ -21,6 +21,7 @@ export const CameraList = ({ cameraes }: { cameraes: Camera[] }) => {
           <div>Coords</div>
           <div>hfov</div>
           <div>heading</div>
+          <div>height</div>
         </div>
         {cameraes.map((camera) => (
           <div
@@ -32,7 +33,13 @@ export const CameraList = ({ cameraes }: { cameraes: Camera[] }) => {
             } ${
               hoveredCameraId === camera.id ? "camera-list__item--hovered" : ""
             }`}
-            onClick={() => setSelectedCameraId(camera.id)}
+            onClick={() => {
+              if (selectedCameraId === camera.id) {
+                setSelectedCameraId(null);
+              } else {
+                setSelectedCameraId(camera.id);
+              }
+            }}
             onMouseEnter={() => setHoveredCameraId(camera.id)}
             onMouseLeave={() => setHoveredCameraId(null)}
           >
