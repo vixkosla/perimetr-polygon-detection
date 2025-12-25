@@ -77,6 +77,36 @@ const LABEL = {
 // КОМПОНЕНТ
 // ============================================================================
 
+// Вспомогательная функция для вычисления координат дуги угла
+const calculateArcPoints = (
+  centerLng: number,
+  centerLat: number,
+  heading: number,
+  hfov: number,
+  radius: number,
+  segments: number = 20,
+) => {
+  const points: [number, number][] = [];
+  const startAngle = heading - hfov / 2;
+  const endAngle = heading + hfov / 2;
+  
+  for (let i = 0; i <= segments; i++) {
+    const angle = startAngle + (endAngle - startAngle) * (i / segments);
+    const rad = (angle * Math.PI) / 180;
+    
+    // Приблизительное вычисление координат (для малых расстояний)
+    const dx = radius * Math.sin(rad);
+    const dy = radius * Math.cos(rad);
+    
+    const lng = centerLng + dx / (111320 * Math.cos((centerLat * Math.PI) / 180));
+    const lat = centerLat + dy / 110540;
+    
+    points.push([lng, lat]);
+  }
+  
+  return points;
+};
+
 export const CameraComponent = ({ camera }: { camera: Camera }) => {
   const selectedCameraId = useGlobalStore((state) => state.selectedCameraId);
   const hoveredCameraId = useGlobalStore((state) => state.hoveredCameraId);
@@ -233,6 +263,82 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
             />
           )}
         </Source>
+      )}
+
+      {/* Визуализация угла HFOV */}
+      {(isSelected || isHovered) && camera.polygon && camera.polygon.length > 0 && (
+        <>
+          {/* Дуга угла */}
+          <Source
+            id={`angle-arc-${camera.id}`}
+            type="geojson"
+            data={{
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: calculateArcPoints(
+                  camera.lng,
+                  camera.lat,
+                  camera.settings.heading,
+                  camera.settings.hfov,
+                  200, // радиус дуги в метрах
+                ),
+              },
+              properties: {},
+            }}
+          >
+            <Layer
+              id={`angle-arc-layer-${camera.id}`}
+              type="line"
+              paint={{
+                "line-color": isSelected ? "#ff9800" : "#ffc107",
+                "line-width": 3,
+                "line-opacity": 0.8,
+              }}
+            />
+          </Source>
+
+          {/* Подпись с величиной угла */}
+          <Source
+            id={`angle-label-${camera.id}`}
+            type="geojson"
+            data={{
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: (() => {
+                  const rad = (camera.settings.heading * Math.PI) / 180;
+                  const distance = 250;
+                  const dx = distance * Math.sin(rad);
+                  const dy = distance * Math.cos(rad);
+                  return [
+                    camera.lng + dx / (111320 * Math.cos((camera.lat * Math.PI) / 180)),
+                    camera.lat + dy / 110540,
+                  ];
+                })(),
+              },
+              properties: {
+                angle: `${camera.settings.hfov}°`,
+              },
+            }}
+          >
+            <Layer
+              id={`angle-label-layer-${camera.id}`}
+              type="symbol"
+              layout={{
+                "text-field": ["get", "angle"],
+                "text-size": 16,
+                "text-anchor": "center",
+                "text-allow-overlap": true,
+              }}
+              paint={{
+                "text-color": "#ff9800",
+                "text-halo-color": "rgba(0, 0, 0, 0.8)",
+                "text-halo-width": 2,
+              }}
+            />
+          </Source>
+        </>
       )}
     </>
   );

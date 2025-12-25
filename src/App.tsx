@@ -14,6 +14,7 @@ import { useGlobalStore } from "@/store/useGlobalStore.ts";
 import { CameraComponent } from "@/components/CameraComponent";
 import { CameraList } from "@/components/CameraList/CameraList.tsx";
 import { CameraAddButton } from "@/components/CameraAddButton/CameraAddButton.tsx";
+import { CameraSyncButton } from "@/components/CameraSyncButton/CameraSyncButton.tsx";
 import { CameraAddCursor } from "@/components/CameraAddCursor/CameraAddCursor.tsx";
 
 import { usePreview } from "@/hooks/usePreview.ts";
@@ -155,6 +156,7 @@ function App() {
       </div>
       <div className="interface-container">
         <CameraList cameraes={cameraes} />
+        <CameraSyncButton />
         <CameraAddButton
           isAddingMode={isAddingMode}
           setIsAddingMode={setIsAddingMode}

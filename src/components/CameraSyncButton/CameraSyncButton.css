@@ -1,0 +1,45 @@
+.interface__sync-mode {
+    position: absolute;
+    bottom: calc(5% + 80px);
+    right: 5%;
+    pointer-events: auto;
+}
+
+.sync-mode__button {
+    padding: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
+    background-color: rgba(100, 100, 100, 0.65);
+    border-width: 4px;
+    border-color: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sync-mode__button-animation-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sync-mode__button:hover:not(:disabled) {
+    background-color: rgba(26, 122, 176, 0.9);
+    border-color: rgba(200, 200, 200, 0.95);
+}
+
+.sync-mode__button--syncing {
+    background-color: rgba(26, 122, 176, 0.7);
+    cursor: wait;
+}
+
+.sync-mode__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
