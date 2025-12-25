@@ -89,21 +89,22 @@ const calculateArcPoints = (
   const points: [number, number][] = [];
   const startAngle = heading - hfov / 2;
   const endAngle = heading + hfov / 2;
-  
+
   for (let i = 0; i <= segments; i++) {
     const angle = startAngle + (endAngle - startAngle) * (i / segments);
     const rad = (angle * Math.PI) / 180;
-    
+
     // Приблизительное вычисление координат (для малых расстояний)
     const dx = radius * Math.sin(rad);
     const dy = radius * Math.cos(rad);
-    
-    const lng = centerLng + dx / (111320 * Math.cos((centerLat * Math.PI) / 180));
+
+    const lng =
+      centerLng + dx / (111320 * Math.cos((centerLat * Math.PI) / 180));
     const lat = centerLat + dy / 110540;
-    
+
     points.push([lng, lat]);
   }
-  
+
   return points;
 };
 
@@ -266,7 +267,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
       )}
 
       {/* Визуализация угла HFOV */}
-      {(isSelected || isHovered) && camera.polygon && camera.polygon.length > 0 && (
+      {isSelected && camera.polygon && camera.polygon.length > 0 && (
         <>
           {/* Дуга угла */}
           <Source
@@ -312,7 +313,8 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
                   const dx = distance * Math.sin(rad);
                   const dy = distance * Math.cos(rad);
                   return [
-                    camera.lng + dx / (111320 * Math.cos((camera.lat * Math.PI) / 180)),
+                    camera.lng +
+                      dx / (111320 * Math.cos((camera.lat * Math.PI) / 180)),
                     camera.lat + dy / 110540,
                   ];
                 })(),
