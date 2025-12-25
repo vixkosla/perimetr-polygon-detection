@@ -32,8 +32,15 @@ function App() {
   });
   const [cursor, setCursor] = useState<string>("auto");
 
-  const { data, initData, updateName, updateSettings, clearData } =
-    usePreview();
+  const {
+    data,
+    editingCameraId: previewEditingCameraId,
+    initData,
+    loadCameraData,
+    updateName,
+    updateSettings,
+    clearData,
+  } = usePreview();
 
   const cameraes = useGlobalStore((state) => state.cameraes);
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
@@ -134,13 +141,16 @@ function App() {
           {data && (
             <HelperPopUp
               data={data}
+              editingCameraId={previewEditingCameraId}
               cancelHelper={cancelHelper}
               updateName={updateName}
               updateSettings={updateSettings}
             />
           )}
 
-          {editingCameraId && <CameraEditPopup />}
+          {editingCameraId && !data && (
+            <CameraEditPopup loadCameraData={loadCameraData} />
+          )}
         </Map>
       </div>
       <div className="interface-container">

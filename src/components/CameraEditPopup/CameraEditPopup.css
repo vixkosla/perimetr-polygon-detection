@@ -38,6 +38,12 @@ div:has(.interface__edit-mode) {
     flex: 1;
 }
 
+.edit-mode__controls-button.edit-mode__controls-button-edit {
+    border-top: 1px solid var(--coordinates);
+    border-right: 1px solid var(--coordinates);
+    transform: translateX(1px);
+}
+
 .edit-mode__controls-button.edit-mode__controls-button-trash {
     border-top: 1px solid var(--coordinates);
     border-right: 1px solid var(--coordinates);

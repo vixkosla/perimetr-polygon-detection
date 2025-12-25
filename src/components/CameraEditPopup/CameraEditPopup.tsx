@@ -3,9 +3,14 @@ import { Popup } from "react-map-gl/mapbox";
 import "./CameraEditPopup.css";
 
 import { useGlobalStore } from "@/store/useGlobalStore";
-import { CornerLeftUp, CornerRightUp, Trash2 } from "lucide-react";
+import type { Camera } from "@/types/Camera";
+import { CornerLeftUp, CornerRightUp, Trash2, Pencil } from "lucide-react";
 
-export const CameraEditPopup = () => {
+interface CameraEditPopupProps {
+  loadCameraData: (camera: Camera) => void;
+}
+
+export const CameraEditPopup = ({ loadCameraData }: CameraEditPopupProps) => {
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
 
   const setSelectedCameraId = useGlobalStore(
@@ -39,6 +44,13 @@ export const CameraEditPopup = () => {
     }
   };
 
+  const handleEdit = () => {
+    if (camera) {
+      loadCameraData(camera);
+      setEditingCameraId(null);
+    }
+  };
+
   if (!camera) return null;
 
   return (
@@ -62,6 +74,13 @@ export const CameraEditPopup = () => {
               color="#ab072d"
               strokeWidth={2}
               onClick={() => handleRotate(-15)}
+            />
+          </div>
+          <div className="edit-mode__controls-button edit-mode__controls-button-edit">
+            <Pencil
+              color="#1a7ab0"
+              strokeWidth={2}
+              onClick={handleEdit}
             />
           </div>
           <div className="edit-mode__controls-button edit-mode__controls-button-trash">

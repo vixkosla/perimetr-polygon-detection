@@ -3,11 +3,14 @@ import { DEFAULT_CAMERA_SETTINGS } from "@/constants/defaultCameraSettings";
 
 import type { CameraData } from "@/types/CameraData";
 import type { Settings } from "@/types/Settings";
+import type { Camera } from "@/types/Camera";
 
 export const usePreview = () => {
   const [data, setData] = useState<CameraData | null>(null);
+  const [editingCameraId, setEditingCameraId] = useState<string | null>(null);
 
   const initData = useCallback((lat: number, lng: number) => {
+    setEditingCameraId(null);
     setData({
       name: "",
       lat,
@@ -15,6 +18,16 @@ export const usePreview = () => {
       settings: {
         ...DEFAULT_CAMERA_SETTINGS,
       },
+    });
+  }, []);
+
+  const loadCameraData = useCallback((camera: Camera) => {
+    setEditingCameraId(camera.id);
+    setData({
+      name: camera.name,
+      lat: camera.lat,
+      lng: camera.lng,
+      settings: { ...camera.settings },
     });
   }, []);
 
@@ -30,7 +43,16 @@ export const usePreview = () => {
 
   const clearData = useCallback(() => {
     setData(null);
+    setEditingCameraId(null);
   }, []);
 
-  return { data, initData, updateName, updateSettings, clearData };
+  return {
+    data,
+    editingCameraId,
+    initData,
+    loadCameraData,
+    updateName,
+    updateSettings,
+    clearData,
+  };
 };

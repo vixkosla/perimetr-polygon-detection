@@ -22,6 +22,13 @@ interface GlobalStore {
 
   rotateCamera: (id: string, angleDelta: number) => Promise<void>;
   removeCamera: (id: string) => void;
+  updateCamera: (
+    id: string,
+    name: string,
+    lat: number,
+    lng: number,
+    settings: Settings,
+  ) => Promise<void>;
 
   cameraes: Camera[];
   addCamera: (
@@ -88,6 +95,24 @@ export const useGlobalStore = create<GlobalStore>()(
             state.hoveredCameraId === id ? null : state.hoveredCameraId,
           editingCameraId:
             state.editingCameraId === id ? null : state.editingCameraId,
+        }));
+      },
+
+      updateCamera: async (id, name, lat, lng, settings) => {
+        const polygon = await computePolygon(lat, lng, settings);
+        const updatedCamera: Camera = {
+          id,
+          name,
+          lat,
+          lng,
+          settings,
+          polygon,
+        };
+
+        set((state) => ({
+          cameraes: state.cameraes.map((c) => (c.id === id ? updatedCamera : c)),
+          editingCameraId: null,
+          selectedCameraId: null,
         }));
       },
 

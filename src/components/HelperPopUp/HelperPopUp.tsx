@@ -17,6 +17,7 @@ import { themeColors } from "@/constants/lemeComponentTheme";
 
 interface popupProps {
   data: CameraData;
+  editingCameraId?: string | null;
   cancelHelper: () => void;
   updateName: (name: string) => void;
   updateSettings: (updates: Partial<Settings>) => void;
@@ -24,16 +25,24 @@ interface popupProps {
 
 export const HelperPopUp = ({
   data,
+  editingCameraId,
   cancelHelper,
   updateName,
   updateSettings,
 }: popupProps) => {
   const addCamera = useGlobalStore((state) => state.addCamera);
+  const updateCamera = useGlobalStore((state) => state.updateCamera);
+
+  const isEditMode = !!editingCameraId;
 
   const handleConfirm = async () => {
     const { name, lat, lng, settings } = data;
 
-    await addCamera(name, lat, lng, settings);
+    if (isEditMode && editingCameraId) {
+      await updateCamera(editingCameraId, name, lat, lng, settings);
+    } else {
+      await addCamera(name, lat, lng, settings);
+    }
     cancelHelper();
   };
 
@@ -78,7 +87,7 @@ export const HelperPopUp = ({
       >
         <div className="camera-settings-popup">
           <div className="popup-header">
-            <h3>Настройки ОПУ</h3>
+            <h3>{isEditMode ? "Редактирование ОПУ" : "Настройки ОПУ"}</h3>
           </div>
 
           <div className="popup-content">
@@ -112,7 +121,7 @@ export const HelperPopUp = ({
               Отмена
             </button>
             <button className="btn-confirm" onClick={handleConfirm}>
-              Добавить камеру
+              {isEditMode ? "Сохранить" : "Добавить камеру"}
             </button>
           </div>
         </div>
