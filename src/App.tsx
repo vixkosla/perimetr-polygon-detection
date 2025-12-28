@@ -45,6 +45,7 @@ function App() {
 
   const cameraes = useGlobalStore((state) => state.cameraes);
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
+  const setHoveredCameraId = useGlobalStore((state) => state.setHoveredCameraId);
 
   const setSelectedCameraId = useGlobalStore(
     (state) => state.setSelectedCameraId,
@@ -57,7 +58,10 @@ function App() {
 
   const setMapRef = useGlobalStore.getState().setMapRef;
 
-  const interactiveLayers = cameraes.map((c) => `camera-layer-${c.id}`);
+  const interactiveLayers = cameraes.flatMap((c) => [
+    `camera-layer-${c.id}`,
+    `camera-hit-${c.id}`,
+  ]);
 
   const onMove = (evt: ViewStateChangeEvent) => {
     setViewState(evt.viewState);
@@ -89,12 +93,33 @@ function App() {
       e.features &&
       e.features.length > 0 &&
       e.features[0].layer &&
-      e.features[0].layer.id.startsWith("camera-layer-")
+      (e.features[0].layer.id.startsWith("camera-layer-") ||
+        e.features[0].layer.id.startsWith("camera-hit-"))
     ) {
       setCursor("pointer");
     }
   };
   const onMouseLeave = () => setCursor("auto");
+
+  const onMouseMove = (e: MapMouseEvent) => {
+    const feature = e.features?.find(
+      (f) =>
+        f.layer &&
+        (f.layer.id.startsWith("camera-layer-") ||
+          f.layer.id.startsWith("camera-hit-")) &&
+        f.properties && "id" in f.properties,
+    );
+
+    if (feature && feature.properties) {
+      const cameraId = feature.properties.id as string;
+      setHoveredCameraId(cameraId);
+      // показываем меню редактирования при наведении
+      setEditingCameraId(cameraId);
+    } else {
+      setHoveredCameraId(null);
+      setEditingCameraId(null);
+    }
+  };
 
   return (
     <>
@@ -113,6 +138,7 @@ function App() {
           ref={setMapRef}
           onClick={handleClick}
           onMove={onMove}
+          onMouseMove={onMouseMove}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           cursor={cursor}

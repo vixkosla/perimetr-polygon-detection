@@ -4,7 +4,7 @@ import "./CameraEditPopup.css";
 
 import { useGlobalStore } from "@/store/useGlobalStore";
 import type { Camera } from "@/types/Camera";
-import { CornerLeftUp, CornerRightUp, Trash2, Pencil } from "lucide-react";
+import { CornerLeftUp, CornerRightUp, Trash2, Pencil, X } from "lucide-react";
 
 interface CameraEditPopupProps {
   loadCameraData: (camera: Camera) => void;
@@ -63,37 +63,52 @@ export const CameraEditPopup = ({ loadCameraData }: CameraEditPopupProps) => {
       }}
       anchor="top"
       closeOnClick={false}
+      className="camera-edit-popup-container"
     >
       <div className="interface__edit-mode">
         {/*<h2>Edit Camera</h2>*/}
         {/*<p>Camera settings</p>*/}
-        <div className="edit-mode__container"></div>
         <div className="edit-mode__controls">
           <div className="edit-mode__controls-button edit-mode__controls-button-left">
             <CornerLeftUp
               color="#ab072d"
-              strokeWidth={2}
+              strokeWidth={1.8}
+              size={18}
               onClick={() => handleRotate(-15)}
             />
           </div>
           <div className="edit-mode__controls-button edit-mode__controls-button-edit">
             <Pencil
               color="#1a7ab0"
-              strokeWidth={2}
+              strokeWidth={1.8}
+              size={18}
               onClick={handleEdit}
             />
           </div>
           <div className="edit-mode__controls-button edit-mode__controls-button-trash">
             <Trash2
               color="#ab072d"
-              strokeWidth={2}
+              strokeWidth={1.8}
+              size={18}
               onClick={() => handleDeleteCamera(editingCameraId)}
+            />
+          </div>
+          <div className="edit-mode__controls-button edit-mode__controls-button-close">
+            <X
+              color="#333"
+              strokeWidth={1.8}
+              size={18}
+              onClick={() => {
+                setSelectedCameraId(null);
+                setEditingCameraId(null);
+              }}
             />
           </div>
           <div className="edit-mode__controls-button edit-mode__controls-button-right">
             <CornerRightUp
               color="#ab072d"
-              strokeWidth={2}
+              strokeWidth={1.8}
+              size={18}
               onClick={() => handleRotate(15)}
             />
           </div>

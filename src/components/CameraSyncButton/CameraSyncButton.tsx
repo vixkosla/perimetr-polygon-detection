@@ -4,7 +4,6 @@ import { RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
-import trustedDevices from "@/constants/trustedDevices.json";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { DEFAULT_CAMERA_SETTINGS } from "@/constants/defaultCameraSettings";
 
@@ -20,10 +19,42 @@ export const CameraSyncButton = () => {
   const addCamera = useGlobalStore((state) => state.addCamera);
 
   const handleSync = async () => {
+    // 1) Запросить список адресов у пользователя
+    const input = window.prompt(
+      "Вставьте список адресов камер (JSON-массив, через запятую или с новой строки):",
+      "[\n  \"http://host1/api\",\n  \"http://host2/api\"\n]",
+    );
+
+    if (!input) return; // отмена
+
+    const parseInputToUrls = (raw: string): string[] => {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((v) => typeof v === "string");
+        }
+        if (parsed && Array.isArray(parsed.devices)) {
+          return parsed.devices.filter((v: unknown) => typeof v === "string");
+        }
+      } catch {
+        // not JSON, continue to split
+      }
+      return raw
+        .split(/[\n,;]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    };
+
+    const deviceUrls = parseInputToUrls(input);
+    if (deviceUrls.length === 0) {
+      alert("Список адресов пуст или не распознан");
+      return;
+    }
+
     setIsSyncing(true);
 
     try {
-      const promises = trustedDevices.devices.map(async (deviceUrl) => {
+      const promises = deviceUrls.map(async (deviceUrl) => {
         try {
           const response = await fetch(deviceUrl, {
             method: "GET",

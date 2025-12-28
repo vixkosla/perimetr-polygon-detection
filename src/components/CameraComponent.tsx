@@ -1,6 +1,7 @@
 import type { Camera } from "@/types/Camera";
 import { Source, Layer } from "react-map-gl/mapbox";
 import { useGlobalStore } from "@/store/useGlobalStore.ts";
+import { destinationPoint } from "@/services/destinationPoint";
 
 // ============================================================================
 // КОНСТАНТЫ ВИЗУАЛЬНЫХ ЭФФЕКТОВ
@@ -73,40 +74,45 @@ const LABEL = {
   HALO_BLUR: 0,
 } as const;
 
+// Параметры визуализации heading (дуга + подпись)
+const HEADING_ARC = {
+  COLOR_PRIMARY: "rgba(50, 0, 50, 0.6)", // соответствует цвету heading в списке
+  COLOR_SECONDARY: "rgba(50, 0, 50, 0.35)",
+  ARC_WIDTH_DEG: 12, // устарело для предыдущей реализации (оставлено на будущее)
+  RADIUS_METERS: 220, // базовый радиус дуги/лучей
+} as const;
+
 // ============================================================================
 // КОМПОНЕНТ
 // ============================================================================
 
-// Вспомогательная функция для вычисления координат дуги угла
-const calculateArcPoints = (
+// Вспомогательная функция: дуга по часовой стрелке от startBearing до endBearing
+const calculateArcPointsCW = (
   centerLng: number,
   centerLat: number,
-  heading: number,
-  hfov: number,
-  radius: number,
-  segments: number = 20,
+  startBearing: number,
+  endBearing: number,
+  radiusMeters: number,
 ) => {
+  // нормализуем в [0, 360)
+  const normalize360 = (a: number) => ((a % 360) + 360) % 360;
+  const start = normalize360(startBearing);
+  let end = normalize360(endBearing);
+  // обеспечить движение по часовой стрелке
+  if (end < start) end += 360;
+  const delta = end - start;
+  const steps = Math.max(12, Math.round(delta / 6));
   const points: [number, number][] = [];
-  const startAngle = heading - hfov / 2;
-  const endAngle = heading + hfov / 2;
-
-  for (let i = 0; i <= segments; i++) {
-    const angle = startAngle + (endAngle - startAngle) * (i / segments);
-    const rad = (angle * Math.PI) / 180;
-
-    // Приблизительное вычисление координат (для малых расстояний)
-    const dx = radius * Math.sin(rad);
-    const dy = radius * Math.cos(rad);
-
-    const lng =
-      centerLng + dx / (111320 * Math.cos((centerLat * Math.PI) / 180));
-    const lat = centerLat + dy / 110540;
-
-    points.push([lng, lat]);
+  for (let i = 0; i <= steps; i++) {
+    const br = start + (delta * i) / steps;
+    const norm = ((br % 360) + 360) % 360;
+    const p = destinationPoint(centerLat, centerLng, radiusMeters, norm);
+    points.push([p.lon, p.lat]);
   }
-
   return points;
 };
+
+// удалена более общая функция построения дуги, т.к. не используется
 
 export const CameraComponent = ({ camera }: { camera: Camera }) => {
   const selectedCameraId = useGlobalStore((state) => state.selectedCameraId);
@@ -179,6 +185,27 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
             "circle-opacity": circleOpacity,
             "circle-stroke-width": circleStrokeWidth,
             "circle-stroke-color": CIRCLE_STROKE.COLOR,
+          }}
+        />
+        {/* Невидимый hit-layer с увеличенным радиусом для упрощения hover */}
+        <Layer
+          id={`camera-hit-${camera.id}`}
+          type="circle"
+          paint={{
+            "circle-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              8,
+              10,
+              12,
+              14,
+              16,
+              18,
+            ],
+            "circle-color": "#000000",
+            "circle-opacity": 0,
+            "circle-stroke-width": 0,
           }}
         />
 
@@ -266,77 +293,193 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
         </Source>
       )}
 
-      {/* Визуализация угла HFOV */}
-      {isSelected && camera.polygon && camera.polygon.length > 0 && (
+      {/* Визуализация heading: лучи (0° и heading°) + дуга между ними + подпись */}
+      {isSelected && (
         <>
-          {/* Дуга угла */}
+          {/* Лучи */}
           <Source
-            id={`angle-arc-${camera.id}`}
+            id={`heading-rays-${camera.id}`}
             type="geojson"
             data={{
               type: "Feature",
               geometry: {
-                type: "LineString",
-                coordinates: calculateArcPoints(
-                  camera.lng,
-                  camera.lat,
-                  camera.settings.heading,
-                  camera.settings.hfov,
-                  200, // радиус дуги в метрах
-                ),
+                type: "MultiLineString",
+                coordinates: (() => {
+                  const north = destinationPoint(
+                    camera.lat,
+                    camera.lng,
+                    HEADING_ARC.RADIUS_METERS,
+                    0,
+                  );
+                  const head = destinationPoint(
+                    camera.lat,
+                    camera.lng,
+                    HEADING_ARC.RADIUS_METERS,
+                    camera.settings.heading,
+                  );
+                  return [
+                    [
+                      [camera.lng, camera.lat],
+                      [north.lon, north.lat],
+                    ],
+                    [
+                      [camera.lng, camera.lat],
+                      [head.lon, head.lat],
+                    ],
+                  ];
+                })(),
               },
               properties: {},
             }}
           >
             <Layer
-              id={`angle-arc-layer-${camera.id}`}
+              id={`heading-rays-layer-${camera.id}`}
               type="line"
               paint={{
-                "line-color": isSelected ? "#ff9800" : "#ffc107",
-                "line-width": 3,
-                "line-opacity": 0.8,
+                "line-color": HEADING_ARC.COLOR_SECONDARY,
+                "line-width": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  8,
+                  0.5,
+                  12,
+                  1,
+                  16,
+                  1.5,
+                ],
+                "line-opacity": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  8,
+                  0,
+                  10,
+                  0.35,
+                  14,
+                  0.55,
+                ],
+                "line-blur": 0.2,
               }}
             />
           </Source>
 
-          {/* Подпись с величиной угла */}
+          {/* Дуга по часовой стрелке от 0° до heading° (величина heading) */}
+          {(((camera.settings.heading % 360) + 360) % 360) !== 0 && (
+            <Source
+              id={`heading-arc-${camera.id}`}
+              type="geojson"
+              data={{
+                type: "Feature",
+                geometry: {
+                  type: "LineString",
+                  coordinates: calculateArcPointsCW(
+                    camera.lng,
+                    camera.lat,
+                    0,
+                    camera.settings.heading,
+                    HEADING_ARC.RADIUS_METERS,
+                  ),
+                },
+                properties: {},
+              }}
+            >
+              <Layer
+                id={`heading-arc-layer-${camera.id}`}
+                type="line"
+                paint={{
+                  "line-color": HEADING_ARC.COLOR_PRIMARY,
+                  "line-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    8,
+                    0.8,
+                    12,
+                    1.5,
+                    16,
+                    2.2,
+                  ],
+                  "line-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    8,
+                    0,
+                    10,
+                    0.45,
+                    14,
+                    0.8,
+                  ],
+                  "line-blur": 0.2,
+                }}
+              />
+            </Source>
+          )}
+
+          {/* Подпись со значением heading (в градусах) */}
           <Source
-            id={`angle-label-${camera.id}`}
+            id={`heading-label-${camera.id}`}
             type="geojson"
             data={{
               type: "Feature",
               geometry: {
                 type: "Point",
                 coordinates: (() => {
-                  const rad = (camera.settings.heading * Math.PI) / 180;
-                  const distance = 250;
-                  const dx = distance * Math.sin(rad);
-                  const dy = distance * Math.cos(rad);
-                  return [
-                    camera.lng +
-                      dx / (111320 * Math.cos((camera.lat * Math.PI) / 180)),
-                    camera.lat + dy / 110540,
-                  ];
+                  // Размещаем подпись на середине дуги
+                  const mid = (((camera.settings.heading % 360) + 360) % 360) / 2;
+                  const p = destinationPoint(
+                    camera.lat,
+                    camera.lng,
+                    HEADING_ARC.RADIUS_METERS + 40,
+                    mid,
+                  );
+                  return [p.lon, p.lat];
                 })(),
               },
               properties: {
-                angle: `${camera.settings.hfov}°`,
+                text: `${camera.settings.heading}°`,
               },
             }}
           >
             <Layer
-              id={`angle-label-layer-${camera.id}`}
+              id={`heading-label-layer-${camera.id}`}
               type="symbol"
               layout={{
-                "text-field": ["get", "angle"],
-                "text-size": 16,
+                "text-field": ["get", "text"],
+                "text-font": [
+                  "Roboto Mono Regular",
+                  "Arial Unicode MS Regular",
+                ],
+                "text-size": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  8,
+                  10,
+                  12,
+                  14,
+                  16,
+                  16,
+                ],
                 "text-anchor": "center",
-                "text-allow-overlap": true,
+                "text-allow-overlap": false,
               }}
               paint={{
-                "text-color": "#ff9800",
-                "text-halo-color": "rgba(0, 0, 0, 0.8)",
-                "text-halo-width": 2,
+                "text-color": HEADING_ARC.COLOR_PRIMARY,
+                "text-halo-color": "rgba(255, 255, 255, 0.65)",
+                "text-halo-width": 1.2,
+                "text-opacity": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  8,
+                  0,
+                  10,
+                  0.7,
+                  14,
+                  0.95,
+                ],
               }}
             />
           </Source>

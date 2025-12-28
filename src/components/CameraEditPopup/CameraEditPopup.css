@@ -21,11 +21,12 @@ div:has(.interface__edit-mode) {
 .edit-mode__controls {
     border: 2px solid white;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 6px;
     background: white;
-    border-radius: 0 0 18px 20px;
-    transform: translateX(1px);
+    border-radius: 8px;
+    padding: 4px 6px;
 }
 
 .edit-mode__controls-button {
@@ -35,7 +36,7 @@ div:has(.interface__edit-mode) {
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4));
     transition: all 0.2s linear;
     transform-origin: right;
-    flex: 1;
+    flex: 0 0 auto;
 }
 
 .edit-mode__controls-button.edit-mode__controls-button-edit {
@@ -69,24 +70,18 @@ div:has(.interface__edit-mode) {
 }
 
 .edit-mode__controls-button-left {
-    border-radius: 0 5px 0 20px;
+    border-radius: 6px;
     clip-path: inset(-10px 0px -10px -10px);
     border-right: 1px solid var(--coordinates);
     border-top: 1px solid var(--coordinates);
     border-left: 0.5px solid var(--coordinates);
 }
 
-.edit-mode__controls-button-left svg {
-    /*transform: rotateZ(-5deg);*/
-}
-
-.edit-mode__controls-button-right svg {
-    /*transform: rotateZ(5deg);*/
-}
+/* удалены пустые правила для svg, чтобы пройти линтер */
 
 .edit-mode__controls-button-right {
-    border-radius: 5px 0 18px 0;
-    transform: translateX(3px);
+    border-radius: 6px;
+    transform: translateX(0px);
     border-right: 1px solid var(--coordinates);
     border-top: 1px solid var(--coordinates);
 }
@@ -96,4 +91,14 @@ div:has(.interface__edit-mode) {
     /*transform: translateX(3px);*/
     border-left: 1px solid var(--coordinates);
     /*border-top: 1px solid var(--coordinates);*/
+}
+
+/* Кнопка закрытия стилизована как остальные */
+.edit-mode__controls-button-close {
+    border-radius: 6px;
+}
+
+/* Скрыть стандартную кнопку закрытия только для этого попапа */
+.camera-edit-popup-container .mapboxgl-popup-close-button {
+    display: none !important;
 }
