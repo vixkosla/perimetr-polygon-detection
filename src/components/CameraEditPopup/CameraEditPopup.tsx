@@ -21,6 +21,8 @@ export const CameraEditPopup = ({ loadCameraData }: CameraEditPopupProps) => {
     (state) => state.setEditingCameraId,
   );
 
+  console.log("Hello World");
+
   const rotateCamera = useGlobalStore((state) => state.rotateCamera);
   const removeCamera = useGlobalStore((state) => state.removeCamera); // добавили
 
