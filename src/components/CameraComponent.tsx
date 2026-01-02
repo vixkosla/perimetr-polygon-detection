@@ -431,7 +431,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
                   const p = destinationPoint(
                     camera.lat,
                     camera.lng,
-                    HEADING_ARC.RADIUS_METERS + 40,
+                    HEADING_ARC.RADIUS_METERS + 280,
                     mid,
                   );
                   return [p.lon, p.lat];
@@ -466,7 +466,7 @@ export const CameraComponent = ({ camera }: { camera: Camera }) => {
                 "text-allow-overlap": false,
               }}
               paint={{
-                "text-color": HEADING_ARC.COLOR_PRIMARY,
+                "text-color": "#ff0000",
                 "text-halo-color": "rgba(255, 255, 255, 0.65)",
                 "text-halo-width": 1.2,
                 "text-opacity": [

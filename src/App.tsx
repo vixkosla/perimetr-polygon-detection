@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import Map from "react-map-gl/mapbox";
 import type { ViewStateChangeEvent } from "react-map-gl/mapbox";
@@ -46,6 +46,7 @@ function App() {
   const cameraes = useGlobalStore((state) => state.cameraes);
   const editingCameraId = useGlobalStore((state) => state.editingCameraId);
   const setHoveredCameraId = useGlobalStore((state) => state.setHoveredCameraId);
+  const editPopupHover = useGlobalStore((state) => state.editPopupHover);
 
   const setSelectedCameraId = useGlobalStore(
     (state) => state.setSelectedCameraId,
@@ -55,6 +56,7 @@ function App() {
   );
 
   const [isAddingMode, setIsAddingMode] = useState<boolean>(false);
+  const hoverOutTimeoutRef = useRef<number | null>(null);
 
   const setMapRef = useGlobalStore.getState().setMapRef;
 
@@ -111,13 +113,32 @@ function App() {
     );
 
     if (feature && feature.properties) {
+      // отменяем отложенное закрытие, если было
+      if (hoverOutTimeoutRef.current != null) {
+        window.clearTimeout(hoverOutTimeoutRef.current);
+        hoverOutTimeoutRef.current = null;
+      }
       const cameraId = feature.properties.id as string;
       setHoveredCameraId(cameraId);
       // показываем меню редактирования при наведении
       setEditingCameraId(cameraId);
     } else {
-      setHoveredCameraId(null);
-      setEditingCameraId(null);
+      if (editPopupHover) {
+        // курсор над попапом — не закрываем и сбрасываем таймер, если есть
+        if (hoverOutTimeoutRef.current != null) {
+          window.clearTimeout(hoverOutTimeoutRef.current);
+          hoverOutTimeoutRef.current = null;
+        }
+      } else {
+        // курсор не над точкой и не над попапом — запускаем отложенное закрытие
+        if (hoverOutTimeoutRef.current == null) {
+          hoverOutTimeoutRef.current = window.setTimeout(() => {
+            setHoveredCameraId(null);
+            setEditingCameraId(null);
+            hoverOutTimeoutRef.current = null;
+          }, 250);
+        }
+      }
     }
   };
 

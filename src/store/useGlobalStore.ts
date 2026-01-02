@@ -16,9 +16,11 @@ interface GlobalStore {
   selectedCameraId: string | null;
   hoveredCameraId: string | null;
   editingCameraId: string | null;
+  editPopupHover: boolean;
   setSelectedCameraId: (id: string | null) => void;
   setHoveredCameraId: (id: string | null) => void;
   setEditingCameraId: (id: string | null) => void;
+  setEditPopupHover: (val: boolean) => void;
 
   rotateCamera: (id: string, angleDelta: number) => Promise<void>;
   removeCamera: (id: string) => void;
@@ -49,9 +51,11 @@ export const useGlobalStore = create<GlobalStore>()(
       selectedCameraId: null,
       hoveredCameraId: null,
       editingCameraId: null,
+      editPopupHover: false,
       setSelectedCameraId: (id) => set({ selectedCameraId: id }),
       setHoveredCameraId: (id) => set({ hoveredCameraId: id }),
       setEditingCameraId: (id) => set({ editingCameraId: id }),
+      setEditPopupHover: (val) => set({ editPopupHover: val }),
 
       cameraes: [],
 

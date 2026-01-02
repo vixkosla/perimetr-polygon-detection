@@ -21,7 +21,7 @@ export const CameraEditPopup = ({ loadCameraData }: CameraEditPopupProps) => {
     (state) => state.setEditingCameraId,
   );
 
-  console.log("Hello World");
+  const setEditPopupHover = useGlobalStore((state) => state.setEditPopupHover);
 
   const rotateCamera = useGlobalStore((state) => state.rotateCamera);
   const removeCamera = useGlobalStore((state) => state.removeCamera); // добавили
@@ -62,12 +62,18 @@ export const CameraEditPopup = ({ loadCameraData }: CameraEditPopupProps) => {
       onClose={() => {
         setSelectedCameraId(null);
         setEditingCameraId(null);
+        setEditPopupHover(false);
       }}
-      anchor="top"
+      anchor="bottom"
+      offset={16}
       closeOnClick={false}
       className="camera-edit-popup-container"
     >
-      <div className="interface__edit-mode">
+      <div
+        className="interface__edit-mode"
+        onMouseEnter={() => setEditPopupHover(true)}
+        onMouseLeave={() => setEditPopupHover(false)}
+      >
         {/*<h2>Edit Camera</h2>*/}
         {/*<p>Camera settings</p>*/}
         <div className="edit-mode__controls">
